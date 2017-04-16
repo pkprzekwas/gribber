@@ -7,7 +7,7 @@ from bson import json_util
 from pymongo import MongoClient
 from flask import Flask, Response, redirect, url_for, request, render_template
 
-from crawler import crawl
+from crawler import crawl_all
 
 app = Flask(__name__)
 client = MongoClient(
@@ -38,15 +38,16 @@ def get_values():
 
 @app.route('/crawl')
 def crawler():
-    thread.start_new_thread(crawl, ())
-    #new_crawl = threading.Thread(name='crawl', target=crawl)
-    #new_crawl.start()
+    thread.start_new_thread(crawl_all, ())
     return 'Accepted', 202
 
 @app.route('/stats')
-def get_stats():
+def stats():
     return Response(
                 json_util.dumps(db.command("dbstats")),
                 mimetype='application/json'
             )
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')
 

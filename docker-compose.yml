@@ -1,6 +1,6 @@
 web:
   build: .
-  command: python -m flask run --host=0.0.0.0
+  command: gunicorn --enable-stdio-inheritance --config gunicorn_config.py main:app
   ports:
     - "5000:5000"
   volumes:
