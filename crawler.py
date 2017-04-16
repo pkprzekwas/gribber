@@ -1,12 +1,15 @@
+import os
 import re
 import json
 
 import requests
+import pygrib
 from bs4 import BeautifulSoup
 
 from sender import send_email
+from mongo import db
 from config import NCDC_ROOT, GMAIL_USER, PASSWORD, \
-                   LAST_TWO_YEARS, RECEIVER
+                   LAST_TWO_YEARS, RECEIVER, TEMP_GRB
 
 def get_soup(url=None):
     r = requests.get(url)
@@ -69,6 +72,15 @@ def check_if_exists(url=None):
 def save_grib(url):
     response = requests.get(url)
     if response.status_code == 200:
-        with open("gribs/temp.grb2", 'wb') as f:
+        with open(TEMP_GRB, 'wb') as f:
             f.write(response.content)
+        grbs = pygrib.open(TEMP_GRB)
+        grb = grbs.message(4)
+        data = grb.values.tolist()
+        db_doc = {
+            'url': url,
+            'data': data,
+        }
+        db.gribs.insert_one(db_doc)
+        os.remove(TEMP_GRB)
 

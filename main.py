@@ -4,16 +4,12 @@ import thread
 
 import pygrib
 from bson import json_util
-from pymongo import MongoClient
 from flask import Flask, Response, redirect, url_for, request, render_template
 
 from crawler import crawl_all
+from mongo import db
 
 app = Flask(__name__)
-client = MongoClient(
-            os.environ['DB_PORT_27017_TCP_ADDR'],
-            27017)
-db = client.gribs
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 PATH = '{}/gribs/gfs_4_20170328_0000_000.grb2'.format(dir_path)
