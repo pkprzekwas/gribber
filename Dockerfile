@@ -12,6 +12,7 @@ RUN conda install -c anaconda flask=0.12.1 -y && \
 
 ADD . /gribber
 
-#ENV FLASK_APP /gribber/app.py
+# Debug purposes
+ENV FLASK_APP /gribber/main.py
 
 WORKDIR /gribber

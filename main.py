@@ -1,6 +1,7 @@
 import os
 import json
 import thread
+from logging.handlers import RotatingFileHandler
 
 import pygrib
 from bson import json_util
@@ -35,6 +36,8 @@ def get_values():
 @app.route('/crawl')
 def crawler():
     thread.start_new_thread(crawl_all, ())
+    app.logger.info('Crawling started')
+    print('Crawling started')
     return 'Accepted', 202
 
 @app.route('/stats')
@@ -45,5 +48,8 @@ def stats():
             )
 
 if __name__ == '__main__':
+    handler = RotatingFileHandler('/tmp/log.log', maxBytes=10000, backupCount=1)
+    handler.setLevel(logging.INFO)
+    app.logger.addHandler(handler)
     app.run(host='0.0.0.0')
 
