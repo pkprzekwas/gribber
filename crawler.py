@@ -1,15 +1,21 @@
 import os
 import re
 import json
+import pdb # python debugger
+import time
 
 import requests
 import pygrib
+import numpy as np
 from bs4 import BeautifulSoup
 
 from sender import send_email
 from mongo import db
 from config import NCDC_ROOT, GMAIL_USER, PASSWORD, \
                    LAST_TWO_YEARS, RECEIVER, TEMP_GRB
+
+WIND_MESSAGE = 4
+DEBUG = False
 
 def get_soup(url=None):
     r = requests.get(url)
@@ -60,27 +66,35 @@ def crawl_day(day='20170401', url=None, body=None):
     body[url][day_url] = {}
     for grib in gribs:
         grib_url = '{}/{}'.format(day_url, grib)
-        status = check_if_exists(grib_url)
-        body[url][day_url][grib] = status
-        if status == 200:
-            save_grib(grib_url)
+        if DEBUG:
+            status = check_if_exists(grib_url)
+            body[url][day_url][grib] = status
+        save_grib(grib_url)
+        print('File saved {}'.format(grib))
 
 def check_if_exists(url=None):
     r = requests.head(url)
     return r.status_code
 
 def save_grib(url):
+    name = get_name_from_url(url)
     response = requests.get(url)
     if response.status_code == 200:
         with open(TEMP_GRB, 'wb') as f:
             f.write(response.content)
         grbs = pygrib.open(TEMP_GRB)
-        grb = grbs.message(4)
-        data = grb.values.tolist()
+        grb = grbs.message(WIND_MESSAGE)
+        np.save('/tmp/{}'.format(name), grb.values)
         db_doc = {
+            'time': time.time(),
+            'name': name,
             'url': url,
-            'data': data,
         }
         db.gribs.insert_one(db_doc)
         os.remove(TEMP_GRB)
+
+def get_name_from_url(url):
+    url_as_list = url.split('/')
+    name = url_as_list[-1]
+    return name
 
