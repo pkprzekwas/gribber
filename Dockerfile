@@ -10,9 +10,11 @@ RUN conda install -c anaconda flask=0.12.1 -y && \
     conda install -c anaconda requests=2.13.0 -y && \
 	conda install -c anaconda gunicorn=19.1.0 -y
 
-ADD . /gribber
+RUN conda install -c anaconda pytest=3.0.7 -y
 
-# Debug purposes
-ENV FLASK_APP /gribber/main.py
+ADD . /application
 
-WORKDIR /gribber
+WORKDIR /application
+
+CMD ["pytest"]
+CMD ["python", "src/main.py"]

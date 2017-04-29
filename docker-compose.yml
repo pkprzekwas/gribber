@@ -1,11 +1,6 @@
-web:
-  build: .
-  command: gunicorn --enable-stdio-inheritance --config gunicorn_config.py main:app
-  ports:
-    - "5000:5000"
-  volumes:
-    - .:/gribber
-  links:
-    - db
-db:
-  image: mongo:3.0.2
+version: '2'
+services:
+  gribber:
+    build: .
+    volumes:
+     - .:/application
