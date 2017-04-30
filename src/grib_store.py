@@ -17,8 +17,11 @@ class GribStore:
     __metaclass__ = SingletonType
 
     def __init__(self):
-        self.dir = os.path.join(BASE_DIR, 'gribs')
+        self.dir = os.path.join(BASE_DIR, 'out')
 
     @property
     def gribs(self):
-        return sorted(os.listdir(self.dir))
+        np_gribs = sorted(os.listdir(self.dir))
+        # trimming '.npy'
+        grib_files = [gf[:-4] for gf in np_gribs]
+        return grib_files

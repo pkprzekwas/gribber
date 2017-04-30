@@ -49,6 +49,7 @@ class Crawler:
             if grib in self.gs.gribs:
                 logger.info('{} already stored. Omitting...'.format(grib))
                 continue
+
             grib_url = '{}/{}'.format(day_url, grib)
             status = check_if_exists(grib_url)
 
