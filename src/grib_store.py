@@ -1,5 +1,6 @@
 import os
 
+from logger import logger
 from config import BASE_DIR
 
 
@@ -11,19 +12,30 @@ class GribStore:
     def gribs(self):
         return sorted(os.listdir(self.dir))
 
-    def last_grib(self):
+    def _last_grib(self):
+        if len(self.gribs) == 0:
+            logger.info('No files downloaded yet')
+            return
         return self.gribs[0]
 
     def _last_grib_splited(self):
-        grb = self.get_last_grib()
+        grb = self._last_grib()
+        if grb is None:
+            return
         return grb.split('_')
 
     def last_gribs_date(self):
-        return self._last_grib_splited()[2]
+        lgs =  self._last_grib_splited()
+        if lgs is None:
+            return '99999999'
+        return lgs[2]
 
     def last_gribs_month(self):
-        date = self.get_last_grib_as_date()
-        return date[:4]
+        date = self.last_gribs_date()
+        return date[:6]
 
     def last_gribs_hour(self):
-        return self._last_grib_splited()[3]
+        lgs = self._last_grib_splited()
+        if lgs is None:
+            return 25
+        return lgs[3][:2]
