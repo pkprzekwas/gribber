@@ -24,6 +24,7 @@ def get_name_from_url(url):
 class Crawler:
     def __init__(self):
         self.gs = GribStore()
+        Grib.out_dir_check()
 
     def start(self):
         m_ext = GFSExtractor(root=NCDC_ROOT)
@@ -58,7 +59,6 @@ class Crawler:
                 continue
 
             self._save_grib(grib_url)
-            logger.info('File saved {}'.format(grib))
 
     def _save_grib(self, url):
         name = get_name_from_url(url)
